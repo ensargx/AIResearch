@@ -77,10 +77,15 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
         
-        if (i//batch_size) % 100 == 0:
-            print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}' 
-                    .format(epoch+1, num_epochs, i//batch_size, len(train_data)//batch_size, loss.item()))
-    print('Epoch [{}/{}], Loss: {:.4f}'.format(epoch+1, num_epochs, loss.item()))
+        #if (i//batch_size) % 100 == 0:
+            #print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'.format(epoch+1, num_epochs, i//batch_size, len(train_data)//batch_size, loss.item()))
+        tamami = len(train_data)//batch_size
+        biten = i//batch_size
+        oran = int(biten/tamami * 50)
+        kalan = 50 - oran - 1
+        print('Epoch [{}/{}]\t[{}>{}]\tLoss: {:.4f}'.format(epoch+1, num_epochs, '='*oran, ' '*kalan, loss.item()), end='\r')
+    #print('Epoch [{}/{}],\t Loss: {:.4f}'.format(epoch+1, num_epochs, loss.item()))
+    print()
 
 # Test the model
 with torch.no_grad():
@@ -117,6 +122,11 @@ def check_image_by_hand(id):
     plt.title('Prediction: {}'.format(predicted.item()))
     plt.show()
 
+
+# Save the model checkpoint
+print('Saving the model as \'mnist-model.ckpt\'..')
+torch.save(model.state_dict(), 'mnist-model.ckpt')
+
 # Check the image by hand
 print('Check the image by hand, press q to quit')
 num_examples = len(test_data)
@@ -126,5 +136,11 @@ while True:
     if id == 'q':
         print('Exitting the program...')
         break
+    if not id.isdigit():
+        print('Please enter a number or press q to quit')
+        continue
+    if int(id) < 0 or int(id) >= num_examples:
+        print('Please enter a number between 0 and {}'.format(num_examples-1))
+        continue
     id = int(id)
     check_image_by_hand(id)
